@@ -19,23 +19,44 @@ const Mp3ToWavConverter = () => {
     }
   };
 
-  const handleConvert = () => {
+  const handleConvert = async () => {
     if (!file) {
       alert('Please select an MP3 file first.');
       return;
     }
     setConverting(true);
-    // Simulating conversion process
-    let currentProgress = 0;
-    const interval = setInterval(() => {
-      currentProgress += 10;
-      setProgress(currentProgress);
-      if (currentProgress >= 100) {
-        clearInterval(interval);
-        setConverting(false);
-        alert('Conversion complete! (This is a simulation)');
+    setProgress(0);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch('http://localhost:3001/convert', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'converted.wav';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        alert('Conversion complete! File downloaded.');
+      } else {
+        throw new Error('Conversion failed');
       }
-    }, 500);
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Conversion failed. Please try again.');
+    } finally {
+      setConverting(false);
+      setProgress(100);
+    }
   };
 
   return (
@@ -44,13 +65,12 @@ const Mp3ToWavConverter = () => {
       
       <Alert className="mb-6">
         <InfoIcon className="h-4 w-4" />
-        <AlertTitle>Backend Required</AlertTitle>
+        <AlertTitle>How to Use</AlertTitle>
         <AlertDescription>
-          This frontend demo simulates the conversion process. To implement actual conversion:
           <ol className="list-decimal list-inside mt-2">
-            <li>Set up a backend server with FFmpeg installed.</li>
-            <li>Create an API endpoint for file upload and conversion.</li>
-            <li>Update this frontend to send files to your backend API.</li>
+            <li>Select an MP3 file using the file input below.</li>
+            <li>Click the "Convert to WAV" button to start the conversion.</li>
+            <li>Once complete, the converted WAV file will automatically download.</li>
           </ol>
         </AlertDescription>
       </Alert>
