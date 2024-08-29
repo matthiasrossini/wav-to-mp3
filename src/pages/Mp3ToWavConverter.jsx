@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { InfoIcon } from 'lucide-react';
+import { InfoIcon, CheckCircle2, XCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 const Mp3ToWavConverter = () => {
   const [file, setFile] = useState(null);
@@ -14,14 +15,16 @@ const Mp3ToWavConverter = () => {
     const selectedFile = e.target.files[0];
     if (selectedFile && selectedFile.type === 'audio/mpeg') {
       setFile(selectedFile);
+      toast.success('MP3 file selected successfully');
     } else {
-      alert('Please select a valid MP3 file.');
+      toast.error('Please select a valid MP3 file.');
+      setFile(null);
     }
   };
 
   const handleConvert = async () => {
     if (!file) {
-      alert('Please select an MP3 file first.');
+      toast.error('Please select an MP3 file first.');
       return;
     }
     setConverting(true);
@@ -42,20 +45,25 @@ const Mp3ToWavConverter = () => {
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = url;
-        a.download = 'converted.wav';
+        a.download = `${file.name.replace('.mp3', '')}.wav`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
-        alert('Conversion complete! File downloaded.');
+        toast.success('Conversion complete! File downloaded.', {
+          icon: <CheckCircle2 className="h-4 w-4 text-green-500" />,
+        });
       } else {
         throw new Error('Conversion failed');
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Conversion failed. Please try again.');
+      toast.error('Conversion failed. Please try again.', {
+        icon: <XCircle className="h-4 w-4 text-red-500" />,
+      });
     } finally {
       setConverting(false);
       setProgress(100);
+      setTimeout(() => setProgress(0), 1000);
     }
   };
 
@@ -76,14 +84,14 @@ const Mp3ToWavConverter = () => {
       </Alert>
 
       <div className="mb-4">
-        <Input type="file" accept=".mp3" onChange={handleFileChange} />
+        <Input type="file" accept=".mp3" onChange={handleFileChange} className="cursor-pointer" />
       </div>
       
       <Button onClick={handleConvert} disabled={!file || converting} className="w-full mb-4">
         {converting ? 'Converting...' : 'Convert to WAV'}
       </Button>
       
-      {converting && (
+      {progress > 0 && (
         <Progress value={progress} className="w-full mb-4" />
       )}
       
