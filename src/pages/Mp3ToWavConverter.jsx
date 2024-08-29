@@ -69,7 +69,7 @@ const Mp3ToWavConverter = () => {
 
   return (
     <div className="container mx-auto p-8 max-w-2xl">
-      <h1 className="text-4xl font-bold mb-8 neon-text text-center">SoundShift Ninja</h1>
+      <h1 className="text-4xl font-bold mb-8 text-primary text-center">Avlana Sound Converter</h1>
       
       <Alert className="mb-8 bg-card border-secondary">
         <InfoIcon className="h-5 w-5 text-secondary" />
