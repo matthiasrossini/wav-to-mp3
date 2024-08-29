@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { InfoIcon, CheckCircle2, XCircle } from 'lucide-react';
+import { InfoIcon, CheckCircle2, XCircle, Upload, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Mp3ToWavConverter = () => {
@@ -50,7 +50,7 @@ const Mp3ToWavConverter = () => {
         a.click();
         window.URL.revokeObjectURL(url);
         toast.success('Conversion complete! File downloaded.', {
-          icon: <CheckCircle2 className="h-4 w-4 text-green-500" />,
+          icon: <CheckCircle2 className="h-4 w-4 text-accent" />,
         });
       } else {
         throw new Error('Conversion failed');
@@ -58,7 +58,7 @@ const Mp3ToWavConverter = () => {
     } catch (error) {
       console.error('Error:', error);
       toast.error('Conversion failed. Please try again.', {
-        icon: <XCircle className="h-4 w-4 text-red-500" />,
+        icon: <XCircle className="h-4 w-4 text-destructive" />,
       });
     } finally {
       setConverting(false);
@@ -68,35 +68,54 @@ const Mp3ToWavConverter = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-2xl">
-      <h1 className="text-3xl font-bold mb-6">MP3 to WAV Converter</h1>
+    <div className="container mx-auto p-8 max-w-2xl">
+      <h1 className="text-4xl font-bold mb-8 neon-text text-center">SoundShift Ninja</h1>
       
-      <Alert className="mb-6">
-        <InfoIcon className="h-4 w-4" />
-        <AlertTitle>How to Use</AlertTitle>
-        <AlertDescription>
+      <Alert className="mb-8 bg-card border-secondary">
+        <InfoIcon className="h-5 w-5 text-secondary" />
+        <AlertTitle className="text-secondary font-bold">How to Use</AlertTitle>
+        <AlertDescription className="text-foreground">
           <ol className="list-decimal list-inside mt-2">
-            <li>Select an MP3 file using the file input below.</li>
-            <li>Click the "Convert to WAV" button to start the conversion.</li>
-            <li>Once complete, the converted WAV file will automatically download.</li>
+            <li>Upload your MP3 file using the input below.</li>
+            <li>Click "Transform Audio" to start the conversion.</li>
+            <li>Download your newly forged WAV file.</li>
           </ol>
         </AlertDescription>
       </Alert>
 
-      <div className="mb-4">
-        <Input type="file" accept=".mp3" onChange={handleFileChange} className="cursor-pointer" />
+      <div className="mb-6">
+        <Input 
+          type="file" 
+          accept=".mp3" 
+          onChange={handleFileChange} 
+          className="cursor-pointer bg-muted text-foreground border-secondary focus:border-primary"
+        />
       </div>
       
-      <Button onClick={handleConvert} disabled={!file || converting} className="w-full mb-4">
-        {converting ? 'Converting...' : 'Convert to WAV'}
+      <Button 
+        onClick={handleConvert} 
+        disabled={!file || converting} 
+        className="w-full mb-6 bg-primary hover:bg-primary/80 text-primary-foreground font-bold py-3"
+      >
+        {converting ? (
+          <>
+            <Zap className="mr-2 h-5 w-5 animate-pulse" />
+            Transforming...
+          </>
+        ) : (
+          <>
+            <Upload className="mr-2 h-5 w-5" />
+            Transform Audio
+          </>
+        )}
       </Button>
       
       {progress > 0 && (
-        <Progress value={progress} className="w-full mb-4" />
+        <Progress value={progress} className="w-full mb-6 bg-muted" />
       )}
       
       {file && !converting && (
-        <p className="text-sm text-gray-600">Selected file: {file.name}</p>
+        <p className="text-sm text-secondary text-center">Selected file: {file.name}</p>
       )}
     </div>
   );
